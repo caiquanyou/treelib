@@ -27,7 +27,28 @@ Deprecated! We prefer a unified processing of Tree object.
 from __future__ import unicode_literals
 
 from .misc import deprecated
-
+def Convert_json2tree(jsonfile):
+    '''
+    :param jsonfile:jsonfile
+    :return: tree
+    '''
+    with open(jsonfile, 'r', ) as f:
+        tree_dict = json.load(f)
+    def add_children(children, parent):
+        for i, child in enumerate(children):
+            if type(child).__name__ == 'dict':
+                childID = [*child][0]
+                tree.create_node(childID, childID, parent=parent)
+                if 'children' in child[childID].keys():
+                    add_children(child[childID]['children'], childID)
+            else:
+                tree.create_node(child, child, parent=parent)
+    tree = Tree()
+    root = tree_dict
+    rootID = [*root.keys()][0]
+    tree.create_node(rootID, rootID)
+    add_children(root[rootID]['children'], rootID)
+    return tree
 
 @deprecated(alias='tree.to_graphviz()')
 def export_to_dot(tree, filename=None, shape='circle', graph='digraph'):
